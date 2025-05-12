@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,14 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				veegox: {
+					purple: '#9b87f5',
+					'deep-purple': '#7E69AB',
+					'dark-bg': '#1A1F2C',
+					'darker-bg': '#0f1218',
+					'card-bg': '#221F26',
+					'blue': '#4a7bff'
 				}
 			},
 			borderRadius: {
@@ -84,11 +93,26 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'float': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-10px)' }
+				},
+				'pulse-light': {
+					'0%, 100%': { opacity: '0.6' },
+					'50%': { opacity: '0.8' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'float': 'float 6s ease-in-out infinite',
+				'pulse-light': 'pulse-light 4s ease-in-out infinite'
+			},
+			backgroundImage: {
+				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+				'hero-glow': 'radial-gradient(circle at center, rgba(155, 135, 245, 0.2) 0%, rgba(10, 10, 20, 0) 70%)',
+				'veegox-gradient': 'linear-gradient(to right, #9b87f5, #4a7bff)'
 			}
 		}
 	},
