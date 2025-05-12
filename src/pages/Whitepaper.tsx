@@ -4,78 +4,30 @@ import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import WhitepaperSection from "@/components/whitepaper-section";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { ArrowDown, Download, FileText, Copy } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+
+// Import refactored components
+import WhitepaperHero from "@/components/whitepaper/whitepaper-hero";
+import TableOfContents from "@/components/whitepaper/table-of-contents";
+import WhitepaperConclusion from "@/components/whitepaper/whitepaper-conclusion";
+import TokensDistribution from "@/components/whitepaper/sections/tokens-distribution";
+import GovernanceProcess from "@/components/whitepaper/sections/governance-process";
+import GovernanceDomains from "@/components/whitepaper/sections/governance-domains";
+import TeamCards from "@/components/whitepaper/sections/team-cards";
+import PartnerLogos from "@/components/whitepaper/sections/partner-logos";
+import RoadmapPhases from "@/components/whitepaper/sections/roadmap-phases";
 
 const Whitepaper = () => {
-  const { toast } = useToast();
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(window.location.href);
-    toast({
-      title: "Lien copié",
-      description: "Le lien du whitepaper a été copié dans le presse-papier",
-    });
-  };
-
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
       <main className="flex-grow pt-20">
         {/* Hero Section */}
-        <div className="bg-veegox-dark-bg py-16">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-10">
-              <h1 className="text-4xl font-bold mb-4">Whitepaper Veegox</h1>
-              <p className="text-xl text-gray-400">
-                Écosystème Financier Décentralisé Multi-token avec IA
-              </p>
-            </div>
-            
-            <div className="flex justify-center space-x-4 mb-8">
-              <Button variant="outline" onClick={copyToClipboard} className="flex items-center gap-2">
-                <Copy className="h-4 w-4" />
-                Copier le lien
-              </Button>
-              <Button className="bg-veegox-gradient flex items-center gap-2">
-                <Download className="h-4 w-4" />
-                Télécharger le PDF
-              </Button>
-            </div>
-            
-            <div className="flex justify-center">
-              <ArrowDown className="h-6 w-6 text-veegox-purple animate-bounce" />
-            </div>
-          </div>
-        </div>
+        <WhitepaperHero />
         
-        {/* Table of Contents */}
+        {/* Content Section with Table of Contents */}
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="bg-veegox-card-bg rounded-lg p-6 mb-12">
-            <h2 className="text-2xl font-bold mb-4">Table des matières</h2>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <ol className="list-decimal list-inside space-y-2">
-                  <li><a href="#introduction" className="text-veegox-purple hover:text-veegox-blue transition-colors">Introduction</a></li>
-                  <li><a href="#vision" className="text-veegox-purple hover:text-veegox-blue transition-colors">Vision et Mission</a></li>
-                  <li><a href="#ecosystem" className="text-veegox-purple hover:text-veegox-blue transition-colors">Écosystème Veegox</a></li>
-                  <li><a href="#tokens" className="text-veegox-purple hover:text-veegox-blue transition-colors">Tokenomics</a></li>
-                  <li><a href="#lending" className="text-veegox-purple hover:text-veegox-blue transition-colors">Crédit Décentralisé</a></li>
-                </ol>
-              </div>
-              <div>
-                <ol className="list-decimal list-inside space-y-2" start={6}>
-                  <li><a href="#savings" className="text-veegox-purple hover:text-veegox-blue transition-colors">Épargne et Staking</a></li>
-                  <li><a href="#governance" className="text-veegox-purple hover:text-veegox-blue transition-colors">Gouvernance DAO</a></li>
-                  <li><a href="#ai-investing" className="text-veegox-purple hover:text-veegox-blue transition-colors">Investissement IA</a></li>
-                  <li><a href="#roadmap" className="text-veegox-purple hover:text-veegox-blue transition-colors">Feuille de Route</a></li>
-                  <li><a href="#team" className="text-veegox-purple hover:text-veegox-blue transition-colors">Équipe et Partenaires</a></li>
-                </ol>
-              </div>
-            </div>
-          </div>
+          <TableOfContents />
           
           {/* Whitepaper Content Sections */}
           <WhitepaperSection
@@ -136,85 +88,7 @@ const Whitepaper = () => {
               "L'écosystème Veegox repose sur une architecture multi-token soigneusement conçue pour optimiser les différentes fonctionnalités de la plateforme. Chaque token a un rôle spécifique et des mécanismes économiques distincts."
             ]}
           >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              <div className="bg-veegox-dark-bg p-6 rounded-lg border border-veegox-purple/30">
-                <h4 className="font-bold text-xl mb-2">VEX</h4>
-                <p className="text-sm text-gray-300 mb-4">Token principal utilitaire</p>
-                <ul className="list-disc list-inside text-sm space-y-2 text-gray-300">
-                  <li>Utilisé pour les frais sur la plateforme</li>
-                  <li>Donne accès aux services premium</li>
-                  <li>Peut être staké pour obtenir des récompenses</li>
-                  <li>Offre des droits de gouvernance basiques</li>
-                </ul>
-                <div className="mt-4 pt-4 border-t border-gray-700">
-                  <div className="flex justify-between text-sm">
-                    <span>Offre totale:</span>
-                    <span className="font-mono">100,000,000 VEX</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-veegox-dark-bg p-6 rounded-lg border border-blue-500/30">
-                <h4 className="font-bold text-xl mb-2">sVEX</h4>
-                <p className="text-sm text-gray-300 mb-4">Token stable d'épargne</p>
-                <ul className="list-disc list-inside text-sm space-y-2 text-gray-300">
-                  <li>Indexé sur l'USDC (1:1)</li>
-                  <li>Utilisé pour l'épargne à rendement fixe</li>
-                  <li>Protection contre la volatilité du marché</li>
-                  <li>Processus de frappe et rachat transparent</li>
-                </ul>
-                <div className="mt-4 pt-4 border-t border-gray-700">
-                  <div className="flex justify-between text-sm">
-                    <span>Émission:</span>
-                    <span className="font-mono">Dynamique (collatéralisée)</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-veegox-dark-bg p-6 rounded-lg border border-purple-500/30">
-                <h4 className="font-bold text-xl mb-2">gVEX</h4>
-                <p className="text-sm text-gray-300 mb-4">Token de gouvernance</p>
-                <ul className="list-disc list-inside text-sm space-y-2 text-gray-300">
-                  <li>Obtenu via le staking verrouillé de VEX</li>
-                  <li>Donne des droits de vote dans la DAO</li>
-                  <li>Permet de soumettre des propositions</li>
-                  <li>Durée de verrouillage = poids de vote augmenté</li>
-                </ul>
-                <div className="mt-4 pt-4 border-t border-gray-700">
-                  <div className="flex justify-between text-sm">
-                    <span>Modèle:</span>
-                    <span className="font-mono">Non-transférable</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <h4 className="font-bold text-xl mb-4">Distribution des tokens</h4>
-            <div className="bg-veegox-darker-bg p-6 rounded-lg mb-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h5 className="font-semibold mb-2">Allocation initiale</h5>
-                  <ul className="list-disc list-inside text-sm space-y-2 text-gray-300">
-                    <li>Vente publique: 40%</li>
-                    <li>Trésorerie DAO: 20%</li>
-                    <li>Équipe et conseillers: 15% (bloqués sur 3 ans)</li>
-                    <li>Développement écosystème: 15%</li>
-                    <li>Marketing et partenariats: 5%</li>
-                    <li>Réserve de liquidité: 5%</li>
-                  </ul>
-                </div>
-                <div>
-                  <h5 className="font-semibold mb-2">Mécanismes économiques</h5>
-                  <ul className="list-disc list-inside text-sm space-y-2 text-gray-300">
-                    <li>Rachat et destruction automatique: 30% des frais</li>
-                    <li>Récompenses staking: 40% des frais</li>
-                    <li>Trésorerie DAO: 30% des frais</li>
-                    <li>Émission décroissante avec halvings programmés</li>
-                    <li>Modèle déflationniste à long terme</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
+            <TokensDistribution />
           </WhitepaperSection>
           
           <WhitepaperSection
@@ -279,45 +153,8 @@ const Whitepaper = () => {
               "Notre modèle de gouvernance est conçu pour être équitable, transparent et résistant aux attaques, tout en permettant une évolution agile de l'écosystème."
             ]}
           >
-            <div className="mb-6">
-              <h4 className="font-bold text-xl mb-4">Processus de Gouvernance</h4>
-              <ol className="list-decimal list-inside space-y-4 ml-4">
-                <li className="pl-2">
-                  <span className="font-semibold">Soumission de Proposition</span>
-                  <p className="text-gray-300 ml-6 mt-1">Les détenteurs de gVEX (min. 100,000 points) peuvent soumettre des propositions formelles pour améliorer l'écosystème.</p>
-                </li>
-                <li className="pl-2">
-                  <span className="font-semibold">Phase de Discussion</span>
-                  <p className="text-gray-300 ml-6 mt-1">Période de 7 jours où la communauté débat de la proposition et peut suggérer des modifications.</p>
-                </li>
-                <li className="pl-2">
-                  <span className="font-semibold">Vote Formel</span>
-                  <p className="text-gray-300 ml-6 mt-1">Période de vote de 5 jours où les détenteurs de gVEX votent pour ou contre la proposition.</p>
-                </li>
-                <li className="pl-2">
-                  <span className="font-semibold">Mise en Œuvre</span>
-                  <p className="text-gray-300 ml-6 mt-1">Si approuvée (>66%), la proposition est implémentée par l'équipe technique ou via des contrats intelligents automatisés.</p>
-                </li>
-              </ol>
-            </div>
-            
-            <div className="bg-veegox-card-bg p-6 rounded-lg">
-              <h4 className="font-bold text-xl mb-4">Domaines de Décision DAO</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <ul className="list-disc list-inside space-y-2 text-gray-300">
-                  <li>Paramètres des produits financiers</li>
-                  <li>Allocation des fonds de la trésorerie</li>
-                  <li>Mise à niveau des contrats intelligents</li>
-                  <li>Intégration de nouvelles chaînes/actifs</li>
-                </ul>
-                <ul className="list-disc list-inside space-y-2 text-gray-300">
-                  <li>Ajustements de tokenomics</li>
-                  <li>Partenariats stratégiques</li>
-                  <li>Initiatives de marketing</li>
-                  <li>Changements de gouvernance</li>
-                </ul>
-              </div>
-            </div>
+            <GovernanceProcess />
+            <GovernanceDomains />
           </WhitepaperSection>
           
           <WhitepaperSection
@@ -351,51 +188,7 @@ const Whitepaper = () => {
             id="roadmap"
             title="9. Feuille de Route"
           >
-            <div className="space-y-12">
-              <div>
-                <h4 className="font-bold text-xl mb-4 text-veegox-purple">Phase 1: Fondation (T3 2023 - T1 2024)</h4>
-                <ul className="list-disc list-inside space-y-2 text-gray-300 ml-4">
-                  <li>Développement des smart contracts core</li>
-                  <li>Audit de sécurité initial</li>
-                  <li>Lancement du token VEX</li>
-                  <li>Interface utilisateur de base pour le prêt et l'épargne</li>
-                  <li>Déploiement testnet et programme de bug bounty</li>
-                </ul>
-              </div>
-              
-              <div>
-                <h4 className="font-bold text-xl mb-4 text-veegox-blue">Phase 2: Expansion (T2 2024 - T4 2024)</h4>
-                <ul className="list-disc list-inside space-y-2 text-gray-300 ml-4">
-                  <li>Lancement des tokens sVEX et gVEX</li>
-                  <li>Implémentation du système de scoring on-chain</li>
-                  <li>Déploiement du module d'épargne et staking</li>
-                  <li>Première version de la DAO de gouvernance</li>
-                  <li>Intégration multi-chaînes (Ethereum, Polygon, Arbitrum)</li>
-                </ul>
-              </div>
-              
-              <div>
-                <h4 className="font-bold text-xl mb-4 text-purple-400">Phase 3: Innovation (T1 2025 - T3 2025)</h4>
-                <ul className="list-disc list-inside space-y-2 text-gray-300 ml-4">
-                  <li>Lancement du module d'investissement IA</li>
-                  <li>Marchés de prêts entre pairs</li>
-                  <li>Intégration des NFT comme garantie</li>
-                  <li>Expansion vers les chaînes L2 émergentes</li>
-                  <li>Programmes de partenariat et d'intégration</li>
-                </ul>
-              </div>
-              
-              <div>
-                <h4 className="font-bold text-xl mb-4 text-pink-400">Phase 4: Maturité (T4 2025 et au-delà)</h4>
-                <ul className="list-disc list-inside space-y-2 text-gray-300 ml-4">
-                  <li>Version 2.0 de l'architecture Veegox</li>
-                  <li>Produits financiers avancés (dérivés, options)</li>
-                  <li>Décentralisation complète de la gouvernance</li>
-                  <li>Outils institutionnels</li>
-                  <li>Infrastructure pour projets tiers</li>
-                </ul>
-              </div>
-            </div>
+            <RoadmapPhases />
           </WhitepaperSection>
           
           <WhitepaperSection
@@ -405,66 +198,12 @@ const Whitepaper = () => {
               "Veegox est développé par une équipe internationale d'experts en blockchain, finance et intelligence artificielle, unis par la vision d'un système financier plus ouvert et accessible."
             ]}
           >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              {/* Les profils d'équipe seraient normalement ici */}
-              <div className="bg-veegox-card-bg rounded-lg p-6 text-center">
-                <div className="w-24 h-24 rounded-full bg-veegox-dark-bg mx-auto mb-4 flex items-center justify-center">
-                  <FileText className="h-10 w-10 text-veegox-purple opacity-50" />
-                </div>
-                <h4 className="font-bold">Sophie Martin</h4>
-                <p className="text-sm text-veegox-purple">CEO & Founder</p>
-                <p className="text-sm text-gray-400 mt-2">15 ans d'expérience en fintech et blockchain</p>
-              </div>
-              
-              <div className="bg-veegox-card-bg rounded-lg p-6 text-center">
-                <div className="w-24 h-24 rounded-full bg-veegox-dark-bg mx-auto mb-4 flex items-center justify-center">
-                  <FileText className="h-10 w-10 text-veegox-purple opacity-50" />
-                </div>
-                <h4 className="font-bold">Marc Dubois</h4>
-                <p className="text-sm text-veegox-purple">CTO</p>
-                <p className="text-sm text-gray-400 mt-2">Architecte blockchain et expert en sécurité</p>
-              </div>
-              
-              <div className="bg-veegox-card-bg rounded-lg p-6 text-center">
-                <div className="w-24 h-24 rounded-full bg-veegox-dark-bg mx-auto mb-4 flex items-center justify-center">
-                  <FileText className="h-10 w-10 text-veegox-purple opacity-50" />
-                </div>
-                <h4 className="font-bold">Aisha Nkosi</h4>
-                <p className="text-sm text-veegox-purple">Head of AI</p>
-                <p className="text-sm text-gray-400 mt-2">PhD en ML appliqué à la finance</p>
-              </div>
-            </div>
-            
-            <h4 className="font-bold text-xl mb-4">Partenaires Stratégiques</h4>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <div className="bg-veegox-dark-bg p-4 rounded-lg flex items-center justify-center h-24">
-                <span className="text-gray-400 text-lg">Moralis</span>
-              </div>
-              <div className="bg-veegox-dark-bg p-4 rounded-lg flex items-center justify-center h-24">
-                <span className="text-gray-400 text-lg">ChainLink</span>
-              </div>
-              <div className="bg-veegox-dark-bg p-4 rounded-lg flex items-center justify-center h-24">
-                <span className="text-gray-400 text-lg">Arbitrum</span>
-              </div>
-              <div className="bg-veegox-dark-bg p-4 rounded-lg flex items-center justify-center h-24">
-                <span className="text-gray-400 text-lg">Polygon</span>
-              </div>
-            </div>
+            <TeamCards />
+            <PartnerLogos />
           </WhitepaperSection>
           
           {/* Conclusion */}
-          <div className="bg-veegox-gradient p-0.5 rounded-lg mb-12">
-            <div className="bg-veegox-darker-bg rounded-md p-8 text-center">
-              <h3 className="text-xl font-bold mb-4">Rejoignez la Révolution Financière Décentralisée</h3>
-              <p className="mb-6">
-                Veegox représente la prochaine génération de services financiers, combinant le meilleur de la DeFi et de l'IA
-                pour créer un écosystème ouvert, équitable et accessible à tous.
-              </p>
-              <Button className="bg-veegox-purple hover:bg-veegox-deep-purple">
-                <Link to="/contact">Contactez l'équipe</Link>
-              </Button>
-            </div>
-          </div>
+          <WhitepaperConclusion />
         </div>
       </main>
       
