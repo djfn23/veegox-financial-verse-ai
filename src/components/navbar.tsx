@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -10,11 +11,17 @@ const Navbar = () => {
   const toggleMenu = () => setMobileMenuOpen(!mobileMenuOpen);
 
   const navItems = [
-    { name: "Products", href: "/products" },
+    { name: "Explorer", href: "/explore" },
+    { name: "Produits", href: "#", children: [
+      { name: "Crédit", href: "/lending" },
+      { name: "Épargne", href: "/savings" },
+      { name: "Investissement IA", href: "/ai-investing" },
+    ]},
     { name: "Tokens", href: "/tokens" },
-    { name: "Governance", href: "/governance" },
+    { name: "Gouvernance", href: "/governance" },
     { name: "Whitepaper", href: "/whitepaper" },
     { name: "Blog", href: "/blog" },
+    { name: "Contact", href: "/contact" },
   ];
 
   return (
@@ -41,12 +48,14 @@ const Navbar = () => {
           </div>
 
           <div className="hidden md:block">
-            <Button
-              variant="default"
-              className="bg-veegox-purple hover:bg-veegox-deep-purple text-white"
-            >
-              Connect Wallet
-            </Button>
+            <Link to="/dashboard">
+              <Button
+                variant="default"
+                className="bg-veegox-purple hover:bg-veegox-deep-purple text-white"
+              >
+                Dashboard
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile menu button */}
@@ -73,22 +82,44 @@ const Navbar = () => {
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-veegox-dark-bg">
             {navItems.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-veegox-purple/20 hover:text-white"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {item.name}
-              </Link>
+              item.children ? (
+                <div key={item.name}>
+                  <div className="px-3 py-2 text-base font-medium text-gray-300">
+                    {item.name}
+                  </div>
+                  <div className="pl-4 space-y-1">
+                    {item.children.map((child) => (
+                      <Link
+                        key={child.name}
+                        to={child.href}
+                        className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-veegox-purple/20 hover:text-white"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {child.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-veegox-purple/20 hover:text-white"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {item.name}
+                </Link>
+              )
             ))}
             <div className="pt-4 pb-3">
-              <Button
-                variant="default"
-                className="w-full bg-veegox-purple hover:bg-veegox-deep-purple text-white"
-              >
-                Connect Wallet
-              </Button>
+              <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                <Button
+                  variant="default"
+                  className="w-full bg-veegox-purple hover:bg-veegox-deep-purple text-white"
+                >
+                  Dashboard
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
