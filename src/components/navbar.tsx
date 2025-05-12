@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -14,6 +13,7 @@ const Navbar = () => {
     { name: "Products", href: "/products" },
     { name: "Tokens", href: "/tokens" },
     { name: "Governance", href: "/governance" },
+    { name: "Whitepaper", href: "/whitepaper" },
     { name: "Blog", href: "/blog" },
   ];
 
