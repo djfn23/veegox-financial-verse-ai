@@ -265,11 +265,11 @@ const AIInvesting = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">Horizon d'investissement</label>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Horizon d&apos;investissement</label>
                     <select className="w-full bg-veegox-dark-bg border border-gray-700 rounded-md px-4 py-2" disabled>
-                      <option>Court terme (< 1 an)</option>
+                      <option>Court terme (&lt; 1 an)</option>
                       <option>Moyen terme (1-3 ans)</option>
-                      <option>Long terme (> 3 ans)</option>
+                      <option>Long terme (&gt; 3 ans)</option>
                     </select>
                   </div>
                   <button className="w-full bg-veegox-purple hover:bg-veegox-deep-purple text-white py-2 rounded-md" disabled>
