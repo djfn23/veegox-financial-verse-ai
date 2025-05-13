@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import Logo from "./logo";
 import { Menu, X } from "lucide-react";
+import WalletConnect from "./wallet-connect";
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -47,11 +48,12 @@ const Navbar = () => {
             </div>
           </div>
 
-          <div className="hidden md:block">
+          <div className="hidden md:flex items-center space-x-4">
+            <WalletConnect />
             <Link to="/dashboard">
               <Button
-                variant="default"
-                className="bg-veegox-purple hover:bg-veegox-deep-purple text-white"
+                variant="outline"
+                className="border-veegox-purple/50 text-white"
               >
                 Dashboard
               </Button>
@@ -111,11 +113,12 @@ const Navbar = () => {
                 </Link>
               )
             ))}
-            <div className="pt-4 pb-3">
-              <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+            <div className="pt-4 pb-3 space-y-2">
+              <WalletConnect />
+              <Link to="/dashboard" className="w-full block" onClick={() => setMobileMenuOpen(false)}>
                 <Button
-                  variant="default"
-                  className="w-full bg-veegox-purple hover:bg-veegox-deep-purple text-white"
+                  variant="outline"
+                  className="w-full border-veegox-purple/50 text-white"
                 >
                   Dashboard
                 </Button>
