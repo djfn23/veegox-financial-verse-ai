@@ -1,1 +1,8 @@
+
 project_id = "zsqxomuotkfpbabtzzdp"
+
+[functions.crypto-data]
+verify_jwt = true
+
+[functions.blockchain]
+verify_jwt = true
