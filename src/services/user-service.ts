@@ -49,7 +49,7 @@ export class UserService {
         .from('user_profiles')
         .update({
           score_onchain: newScore,
-          updated_at: new Date()
+          updated_at: new Date().toISOString() // Correction ici: convertir Date en string ISO
         })
         .eq('wallet_address', walletAddress)
         .select()
@@ -110,6 +110,35 @@ export class UserService {
     } catch (error) {
       console.error("Exception lors de la création du profil:", error);
       return null;
+    }
+  }
+
+  /**
+   * Ajoute un wallet administrateur dans la base de données
+   */
+  static async addAdminWallet(walletAddress: string, encryptedPrivateKey: string, description?: string, dailyLimit?: number): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('admin_wallet')
+        .insert([
+          {
+            wallet_address: walletAddress,
+            encrypted_private_key: encryptedPrivateKey,
+            description: description || 'Wallet administrateur principal',
+            daily_limit: dailyLimit || 1000,
+            is_active: true
+          }
+        ]);
+        
+      if (error) {
+        console.error("Erreur lors de l'ajout du wallet administrateur:", error);
+        return false;
+      }
+      
+      return true;
+    } catch (error) {
+      console.error("Exception lors de l'ajout du wallet administrateur:", error);
+      return false;
     }
   }
 }

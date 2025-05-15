@@ -1,4 +1,3 @@
-
 import { Web3Provider } from '@/context/Web3Context';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from '@/components/ui/toaster';
@@ -18,6 +17,7 @@ import Blog from '@/pages/Blog';
 import Contact from '@/pages/Contact';
 import TestnetConfig from '@/pages/TestnetConfig';
 import Whitepaper from '@/pages/Whitepaper';
+import AdminSetup from '@/pages/AdminSetup';
 
 function App() {
   return (
@@ -25,18 +25,19 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/admin/wallets" element={<AdminWallets />} />
           <Route path="/explore" element={<Explore />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/tokens" element={<Tokens />} />
-          <Route path="/savings" element={<Savings />} />
-          <Route path="/lending" element={<Lending />} />
-          <Route path="/ai-investing" element={<AIInvesting />} />
           <Route path="/governance" element={<Governance />} />
+          <Route path="/lending" element={<Lending />} />
+          <Route path="/savings" element={<Savings />} />
+          <Route path="/ai-investing" element={<AIInvesting />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/testnet-config" element={<TestnetConfig />} />
           <Route path="/whitepaper" element={<Whitepaper />} />
+          <Route path="/testnet-config" element={<TestnetConfig />} />
+          <Route path="/admin/wallets" element={<AdminWallets />} />
+          <Route path="/admin/setup" element={<AdminSetup />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />
