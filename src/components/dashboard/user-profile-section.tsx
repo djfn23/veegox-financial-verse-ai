@@ -1,14 +1,10 @@
 
 import { UserCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { UserProfile } from "@/hooks/use-veegox-data";
 
 interface UserProfileSectionProps {
-  profile: {
-    username?: string;
-    wallet_address: string;
-    score_onchain?: number;
-    avatar_url?: string;
-  } | null;
+  profile: UserProfile | null;
   isLoading: boolean;
 }
 

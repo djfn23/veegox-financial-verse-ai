@@ -6,13 +6,15 @@ import { UserService } from '@/services/user-service';
 import { BlockchainService } from '@/services/blockchain-service';
 import { toast } from '@/components/ui/use-toast';
 
-interface UserProfile {
+// Mise à jour de l'interface pour corriger le typage
+export interface UserProfile {
   id: string;
   wallet_address: string;
-  username: string;
-  score_onchain: number;
-  avatar_url?: string;
-  email?: string;
+  username: string | null;
+  score_onchain: number | null;
+  avatar_url?: string | null;
+  email?: string | null;
+  preferences?: Record<string, any> | null;
 }
 
 interface VeegoxData {
