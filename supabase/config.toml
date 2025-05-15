@@ -6,3 +6,6 @@ verify_jwt = true
 
 [functions.blockchain]
 verify_jwt = true
+
+[functions.payment-processor]
+verify_jwt = true

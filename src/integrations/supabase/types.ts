@@ -9,6 +9,98 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          metadata: Json | null
+          network_id: number | null
+          recipient_address: string | null
+          status: string
+          token_symbol: string
+          tx_hash: string | null
+          tx_type: string
+          updated_at: string
+          wallet_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          network_id?: number | null
+          recipient_address?: string | null
+          status?: string
+          token_symbol: string
+          tx_hash?: string | null
+          tx_type: string
+          updated_at?: string
+          wallet_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          network_id?: number | null
+          recipient_address?: string | null
+          status?: string
+          token_symbol?: string
+          tx_hash?: string | null
+          tx_type?: string
+          updated_at?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_transactions_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "admin_wallet"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admin_wallet: {
+        Row: {
+          created_at: string
+          daily_limit: number
+          description: string | null
+          encrypted_private_key: string
+          id: string
+          is_active: boolean
+          last_used: string | null
+          transaction_count: number
+          updated_at: string
+          wallet_address: string
+        }
+        Insert: {
+          created_at?: string
+          daily_limit?: number
+          description?: string | null
+          encrypted_private_key: string
+          id?: string
+          is_active?: boolean
+          last_used?: string | null
+          transaction_count?: number
+          updated_at?: string
+          wallet_address: string
+        }
+        Update: {
+          created_at?: string
+          daily_limit?: number
+          description?: string | null
+          encrypted_private_key?: string
+          id?: string
+          is_active?: boolean
+          last_used?: string | null
+          transaction_count?: number
+          updated_at?: string
+          wallet_address?: string
+        }
+        Relationships: []
+      }
       ai_investment_strategies: {
         Row: {
           allocation: Json
@@ -417,7 +509,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      log_admin_transaction: {
+        Args: {
+          p_wallet_id: string
+          p_tx_type: string
+          p_amount: number
+          p_token_symbol: string
+          p_recipient_address: string
+          p_metadata?: Json
+          p_network_id?: number
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

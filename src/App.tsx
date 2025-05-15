@@ -18,6 +18,7 @@ import Tokens from "./pages/Tokens";
 import Blog from "./pages/Blog";
 import Contact from "./pages/Contact";
 import TestnetConfig from "./pages/TestnetConfig";
+import AdminWallets from "./pages/AdminWallets";
 
 // Add CSS for marquee animation
 import "./App.css";
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/blog" element={<Blog />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/testnet-config" element={<TestnetConfig />} />
+            <Route path="/admin/wallets" element={<AdminWallets />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
