@@ -24,6 +24,13 @@ export interface CommissionReport {
   created_at: string;
 }
 
+export interface CommissionFilters {
+  startDate?: Date;
+  endDate?: Date;
+  tokenSymbols?: string[];
+  transactionTypes?: string[];
+}
+
 /**
  * Service pour gérer les paramètres et rapports de commission
  */
@@ -125,11 +132,10 @@ export class CommissionService {
   }
 
   /**
-   * Récupère les rapports de commission pour une période donnée
+   * Récupère les rapports de commission pour une période donnée avec filtres
    */
   static async getCommissionReports(
-    startDate?: string,
-    endDate?: string
+    filters?: CommissionFilters
   ): Promise<CommissionReport[]> {
     try {
       let query = supabase
@@ -137,14 +143,19 @@ export class CommissionService {
         .select('*')
         .order('period_start', { ascending: false });
       
-      if (startDate) {
-        query = query.gte('period_start', startDate);
+      // Appliquer les filtres de date
+      if (filters?.startDate) {
+        const formattedStartDate = filters.startDate.toISOString();
+        query = query.gte('period_start', formattedStartDate);
       }
       
-      if (endDate) {
-        query = query.lte('period_end', endDate);
+      if (filters?.endDate) {
+        const formattedEndDate = new Date(filters.endDate);
+        formattedEndDate.setHours(23, 59, 59, 999);
+        query = query.lte('period_end', formattedEndDate.toISOString());
       }
       
+      // Récupérer les résultats
       const { data, error } = await query;
 
       if (error) {
@@ -152,7 +163,19 @@ export class CommissionService {
         return [];
       }
 
-      return data as CommissionReport[];
+      // Filtrer les tokens côté client
+      let filteredData = data as CommissionReport[];
+      
+      if (filters?.tokenSymbols && filters.tokenSymbols.length > 0) {
+        filteredData = filteredData.filter(report => 
+          filters.tokenSymbols?.includes(report.token_symbol)
+        );
+      }
+      
+      // Note: Le filtrage par type de transaction peut nécessiter des modifications 
+      // dans la structure de la table, car le champ tx_type n'est pas dans commission_reports
+      
+      return filteredData;
     } catch (error) {
       console.error("Exception lors de la récupération des rapports de commission:", error);
       return [];

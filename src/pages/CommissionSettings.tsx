@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useWeb3 } from "@/context/Web3Context";
-import { CommissionService, CommissionSetting, CommissionReport } from "@/services/commission-service";
+import { CommissionService, CommissionSetting, CommissionReport, CommissionFilters } from "@/services/commission-service";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { Button } from "@/components/ui/button";
@@ -31,6 +31,14 @@ const CommissionSettings = () => {
     is_active: true
   });
 
+  // État pour les filtres des rapports
+  const [filters, setFilters] = useState<CommissionFilters>({
+    startDate: undefined,
+    endDate: undefined,
+    tokenSymbols: [],
+    transactionTypes: []
+  });
+
   useEffect(() => {
     if (isConnected) {
       loadSettings();
@@ -55,16 +63,20 @@ const CommissionSettings = () => {
     }
   };
 
-  const loadReports = async () => {
+  const loadReports = async (reportFilters?: CommissionFilters) => {
     setReportLoading(true);
     try {
-      // Récupérer les rapports des 30 derniers jours
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      // Utiliser les filtres fournis ou ceux actuellement stockés dans l'état
+      const filtersToUse = reportFilters || filters;
       
-      const data = await CommissionService.getCommissionReports(
-        thirtyDaysAgo.toISOString()
-      );
+      // Si aucun filtre de date n'est spécifié, utiliser les 30 derniers jours par défaut
+      if (!filtersToUse.startDate) {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        filtersToUse.startDate = thirtyDaysAgo;
+      }
+      
+      const data = await CommissionService.getCommissionReports(filtersToUse);
       setReports(data);
     } catch (error) {
       console.error("Erreur lors du chargement des rapports:", error);
@@ -76,6 +88,11 @@ const CommissionSettings = () => {
     } finally {
       setReportLoading(false);
     }
+  };
+  
+  const handleApplyFilters = (newFilters: CommissionFilters) => {
+    setFilters(newFilters);
+    loadReports(newFilters);
   };
 
   const handleToggleActive = async (setting: CommissionSetting) => {
@@ -238,6 +255,7 @@ const CommissionSettings = () => {
               <ReportsTab 
                 reports={reports}
                 loading={reportLoading}
+                onApplyFilters={handleApplyFilters}
               />
             </TabsContent>
           </Tabs>
