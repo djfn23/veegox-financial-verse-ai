@@ -3,6 +3,8 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
 
 interface NewCommissionFormProps {
   newSetting: {
@@ -25,7 +27,19 @@ const NewCommissionForm: React.FC<NewCommissionFormProps> = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <div>
-        <Label htmlFor="token_symbol">Symbol du Token</Label>
+        <div className="flex items-center mb-1">
+          <Label htmlFor="token_symbol">Symbol du Token</Label>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button className="ml-1">
+                <Info className="h-4 w-4 text-muted-foreground" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="max-w-xs">Le symbole du token (ex: VEX, ETH, USDC)</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
         <Input 
           id="token_symbol"
           value={newSetting.token_symbol}
@@ -36,7 +50,19 @@ const NewCommissionForm: React.FC<NewCommissionFormProps> = ({
       </div>
 
       <div>
-        <Label htmlFor="tx_type">Type de Transaction</Label>
+        <div className="flex items-center mb-1">
+          <Label htmlFor="tx_type">Type de Transaction</Label>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button className="ml-1">
+                <Info className="h-4 w-4 text-muted-foreground" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="max-w-xs">Type d'opération (ex: transfer, stake, withdraw)</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
         <Input 
           id="tx_type"
           value={newSetting.tx_type}
@@ -47,7 +73,19 @@ const NewCommissionForm: React.FC<NewCommissionFormProps> = ({
       </div>
 
       <div>
-        <Label htmlFor="percentage">Pourcentage (%)</Label>
+        <div className="flex items-center mb-1">
+          <Label htmlFor="percentage">Pourcentage (%)</Label>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button className="ml-1">
+                <Info className="h-4 w-4 text-muted-foreground" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="max-w-xs">Pourcentage de commission (entre 0 et 100)</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
         <Input 
           id="percentage"
           type="number"
@@ -61,7 +99,19 @@ const NewCommissionForm: React.FC<NewCommissionFormProps> = ({
       </div>
 
       <div>
-        <Label htmlFor="min_amount">Montant Min. (Token)</Label>
+        <div className="flex items-center mb-1">
+          <Label htmlFor="min_amount">Montant Min. (Token)</Label>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button className="ml-1">
+                <Info className="h-4 w-4 text-muted-foreground" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="max-w-xs">Montant minimum auquel la commission s'applique (en token)</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
         <Input 
           id="min_amount"
           type="number"
@@ -74,7 +124,19 @@ const NewCommissionForm: React.FC<NewCommissionFormProps> = ({
       </div>
 
       <div>
-        <Label htmlFor="max_amount">Montant Max. (Token)</Label>
+        <div className="flex items-center mb-1">
+          <Label htmlFor="max_amount">Montant Max. (Token)</Label>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button className="ml-1">
+                <Info className="h-4 w-4 text-muted-foreground" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="max-w-xs">Montant maximum auquel la commission s'applique (laisser vide pour illimité)</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
         <Input 
           id="max_amount"
           type="number"
@@ -88,12 +150,19 @@ const NewCommissionForm: React.FC<NewCommissionFormProps> = ({
       </div>
 
       <div className="flex items-end">
-        <Button 
-          onClick={onSubmit} 
-          className="w-full"
-        >
-          Ajouter
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button 
+              onClick={onSubmit} 
+              className="w-full"
+            >
+              Ajouter
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Ajouter ce paramètre de commission</p>
+          </TooltipContent>
+        </Tooltip>
       </div>
     </div>
   );
