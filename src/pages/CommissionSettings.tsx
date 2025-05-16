@@ -201,22 +201,22 @@ const CommissionSettings = () => {
     }, [] as Array<{ name: string; value: number }>);
 
     // Données pour le graphique linéaire (évolution par jour)
-    const lineData: Array<{ date: string; [key: string]: number }> = [];
+    const lineData: Array<{ date: string; [key: string]: number | string }> = [];
     
     reports.forEach(report => {
       const date = new Date(report.period_start).toLocaleDateString();
       const existing = lineData.find(item => item.date === date);
       
       if (existing) {
-        if (existing[report.token_symbol]) {
-          existing[report.token_symbol] += report.total_commission_amount;
+        if (existing[report.token_symbol] !== undefined) {
+          existing[report.token_symbol] = (existing[report.token_symbol] as number) + report.total_commission_amount;
         } else {
           existing[report.token_symbol] = report.total_commission_amount;
         }
       } else {
-        const newEntry = { date };
+        const newEntry: { date: string; [key: string]: number | string } = { date };
         newEntry[report.token_symbol] = report.total_commission_amount;
-        lineData.push(newEntry as any);
+        lineData.push(newEntry);
       }
     });
     
@@ -464,7 +464,9 @@ const CommissionSettings = () => {
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                           ))}
                         </Pie>
-                        <Tooltip formatter={(value) => value.toFixed(4)} />
+                        <Tooltip formatter={(value: number | string) => {
+                          return typeof value === 'number' ? value.toFixed(4) : value;
+                        }} />
                         <Legend />
                       </PieChart>
                     </ResponsiveContainer>
