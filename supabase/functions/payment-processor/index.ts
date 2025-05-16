@@ -93,7 +93,10 @@ async function processTransaction(
   tokenSymbol: string,
   networkId: number,
   txType: string,
-  metadata: any = {}
+  metadata: any = {},
+  commissionAmount?: string,
+  commissionPercentage?: number,
+  originalAmount?: string
 ) {
   try {
     // Récupérer les informations du wallet admin
@@ -115,22 +118,49 @@ async function processTransaction(
       throw new Error('Transaction non valide ou limites dépassées');
     }
 
+    // Paramètres pour le log de transaction
+    const transactionParams: any = {
+      p_wallet_id: walletId,
+      p_tx_type: txType,
+      p_amount: amountNum,
+      p_token_symbol: tokenSymbol,
+      p_recipient_address: recipientAddress,
+      p_metadata: metadata,
+      p_network_id: networkId
+    };
+
+    // Si des informations de commission sont fournies, les ajouter aux métadonnées
+    if (commissionAmount && commissionPercentage) {
+      transactionParams.p_metadata = {
+        ...metadata,
+        commission_details: {
+          original_amount: originalAmount,
+          commission_amount: commissionAmount,
+          commission_percentage: commissionPercentage
+        }
+      };
+    }
+
     // Journaliser la transaction dans la base de données
     const { data: txRecord, error: txError } = await supabase.rpc(
       'log_admin_transaction',
-      {
-        p_wallet_id: walletId,
-        p_tx_type: txType,
-        p_amount: amountNum,
-        p_token_symbol: tokenSymbol,
-        p_recipient_address: recipientAddress,
-        p_metadata: metadata,
-        p_network_id: networkId
-      }
+      transactionParams
     );
 
     if (txError) {
       throw new Error(`Erreur lors de l'enregistrement de la transaction: ${txError.message}`);
+    }
+
+    // Si des informations de commission sont fournies, mettre à jour la transaction
+    if (commissionAmount && commissionPercentage && originalAmount) {
+      await supabase
+        .from('admin_transactions')
+        .update({
+          commission_amount: parseFloat(commissionAmount),
+          commission_percentage: commissionPercentage,
+          original_amount: parseFloat(originalAmount)
+        })
+        .eq('id', txRecord);
     }
 
     // Dans une implémentation réelle, vous connecteriez le wallet et effectueriez la transaction blockchain ici
@@ -305,20 +335,24 @@ serve(async (req) => {
     }
 
     // Traiter la requête selon l'action demandée
-    const { action, ...params } = await req.json();
+    const params = await req.json();
+    const { action, ...otherParams } = params;
     let result;
 
     switch (action) {
       case 'send_transaction':
         result = await processTransaction(
           supabaseClient,
-          params.wallet_id,
-          params.recipient_address,
-          params.amount,
-          params.token_symbol,
-          params.network_id,
-          params.tx_type || 'payment',
-          params.metadata || {}
+          otherParams.wallet_id,
+          otherParams.recipient_address,
+          otherParams.amount,
+          otherParams.token_symbol,
+          otherParams.network_id,
+          otherParams.tx_type || 'payment',
+          otherParams.metadata || {},
+          otherParams.commission_amount,
+          otherParams.commission_percentage,
+          otherParams.original_amount
         );
         break;
         
@@ -333,6 +367,35 @@ serve(async (req) => {
         }
         
         result = { wallets: walletInfo };
+        break;
+
+      case 'get_transactions':
+        let query = supabaseClient
+          .from('admin_transactions')
+          .select('*')
+          .order('created_at', { ascending: false });
+          
+        // Appliquer les filtres fournis
+        if (otherParams.wallet_id) {
+          query = query.eq('wallet_id', otherParams.wallet_id);
+        }
+        if (otherParams.token_symbol) {
+          query = query.eq('token_symbol', otherParams.token_symbol);
+        }
+        if (otherParams.status) {
+          query = query.eq('status', otherParams.status);
+        }
+        if (otherParams.limit) {
+          query = query.limit(otherParams.limit);
+        }
+        
+        const { data: txData, error: txError } = await query;
+        
+        if (txError) {
+          throw new Error(`Erreur lors de la récupération des transactions: ${txError.message}`);
+        }
+        
+        result = { transactions: txData };
         break;
         
       default:

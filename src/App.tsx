@@ -1,3 +1,4 @@
+
 import { Web3Provider } from '@/context/Web3Context';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from '@/components/ui/toaster';
@@ -6,6 +7,7 @@ import { Toaster } from '@/components/ui/toaster';
 import Index from '@/pages/Index';
 import Dashboard from '@/pages/Dashboard';
 import AdminWallets from '@/pages/AdminWallets';
+import CommissionSettings from '@/pages/CommissionSettings';
 import NotFound from '@/pages/NotFound';
 import Explore from '@/pages/Explore';
 import Tokens from '@/pages/Tokens';
@@ -37,6 +39,7 @@ function App() {
           <Route path="/whitepaper" element={<Whitepaper />} />
           <Route path="/testnet-config" element={<TestnetConfig />} />
           <Route path="/admin/wallets" element={<AdminWallets />} />
+          <Route path="/admin/commissions" element={<CommissionSettings />} />
           <Route path="/admin/setup" element={<AdminSetup />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -12,10 +12,13 @@ export type Database = {
       admin_transactions: {
         Row: {
           amount: number
+          commission_amount: number | null
+          commission_percentage: number | null
           created_at: string
           id: string
           metadata: Json | null
           network_id: number | null
+          original_amount: number | null
           recipient_address: string | null
           status: string
           token_symbol: string
@@ -26,10 +29,13 @@ export type Database = {
         }
         Insert: {
           amount: number
+          commission_amount?: number | null
+          commission_percentage?: number | null
           created_at?: string
           id?: string
           metadata?: Json | null
           network_id?: number | null
+          original_amount?: number | null
           recipient_address?: string | null
           status?: string
           token_symbol: string
@@ -40,10 +46,13 @@ export type Database = {
         }
         Update: {
           amount?: number
+          commission_amount?: number | null
+          commission_percentage?: number | null
           created_at?: string
           id?: string
           metadata?: Json | null
           network_id?: number | null
+          original_amount?: number | null
           recipient_address?: string | null
           status?: string
           token_symbol?: string
@@ -133,6 +142,72 @@ export type Database = {
           is_active?: boolean
           name?: string
           risk_level?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      commission_reports: {
+        Row: {
+          created_at: string
+          id: string
+          period_end: string
+          period_start: string
+          token_symbol: string
+          total_commission_amount: number
+          transaction_count: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          period_end: string
+          period_start: string
+          token_symbol: string
+          total_commission_amount?: number
+          transaction_count?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          period_end?: string
+          period_start?: string
+          token_symbol?: string
+          total_commission_amount?: number
+          transaction_count?: number
+        }
+        Relationships: []
+      }
+      commission_settings: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          max_amount: number | null
+          min_amount: number | null
+          percentage: number
+          token_symbol: string
+          tx_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          max_amount?: number | null
+          min_amount?: number | null
+          percentage?: number
+          token_symbol: string
+          tx_type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          max_amount?: number | null
+          min_amount?: number | null
+          percentage?: number
+          token_symbol?: string
+          tx_type?: string
           updated_at?: string
         }
         Relationships: []
