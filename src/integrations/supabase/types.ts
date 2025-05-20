@@ -146,6 +146,33 @@ export type Database = {
         }
         Relationships: []
       }
+      blocks: {
+        Row: {
+          block_number: number
+          current_hash: string
+          id: string
+          previous_hash: string
+          timestamp: string | null
+          transaction_ids: string[]
+        }
+        Insert: {
+          block_number: number
+          current_hash: string
+          id?: string
+          previous_hash: string
+          timestamp?: string | null
+          transaction_ids: string[]
+        }
+        Update: {
+          block_number?: number
+          current_hash?: string
+          id?: string
+          previous_hash?: string
+          timestamp?: string | null
+          transaction_ids?: string[]
+        }
+        Relationships: []
+      }
       commission_reports: {
         Row: {
           created_at: string
@@ -445,52 +472,68 @@ export type Database = {
           },
         ]
       }
+      tokens: {
+        Row: {
+          created_at: string | null
+          creator_address: string
+          id: string
+          name: string
+          symbol: string
+          total_supply: number
+        }
+        Insert: {
+          created_at?: string | null
+          creator_address: string
+          id?: string
+          name: string
+          symbol: string
+          total_supply: number
+        }
+        Update: {
+          created_at?: string | null
+          creator_address?: string
+          id?: string
+          name?: string
+          symbol?: string
+          total_supply?: number
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
-          details: Json | null
+          block_id: string | null
+          hash: string
           id: string
-          network_id: number
+          receiver: string
+          sender: string
           status: string
-          timestamp: string
+          timestamp: string | null
           token_symbol: string
-          tx_hash: string
-          tx_type: string
-          wallet_address: string
         }
         Insert: {
           amount: number
-          details?: Json | null
+          block_id?: string | null
+          hash: string
           id?: string
-          network_id: number
+          receiver: string
+          sender: string
           status?: string
-          timestamp?: string
+          timestamp?: string | null
           token_symbol: string
-          tx_hash: string
-          tx_type: string
-          wallet_address: string
         }
         Update: {
           amount?: number
-          details?: Json | null
+          block_id?: string | null
+          hash?: string
           id?: string
-          network_id?: number
+          receiver?: string
+          sender?: string
           status?: string
-          timestamp?: string
+          timestamp?: string | null
           token_symbol?: string
-          tx_hash?: string
-          tx_type?: string
-          wallet_address?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "transactions_wallet_address_fkey"
-            columns: ["wallet_address"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["wallet_address"]
-          },
-        ]
+        Relationships: []
       }
       user_ai_portfolios: {
         Row: {
@@ -579,22 +622,56 @@ export type Database = {
         }
         Relationships: []
       }
+      wallets: {
+        Row: {
+          address: string
+          balance: number
+          created_at: string | null
+          id: string
+          private_key: string
+        }
+        Insert: {
+          address: string
+          balance?: number
+          created_at?: string | null
+          id?: string
+          private_key: string
+        }
+        Update: {
+          address?: string
+          balance?: number
+          created_at?: string | null
+          id?: string
+          private_key?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      create_block: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       log_admin_transaction: {
-        Args: {
-          p_wallet_id: string
-          p_tx_type: string
-          p_amount: number
-          p_token_symbol: string
-          p_recipient_address: string
-          p_metadata?: Json
-          p_network_id?: number
-        }
-        Returns: string
+        Args:
+          | Record<PropertyKey, never>
+          | {
+              p_wallet_id: string
+              p_tx_type: string
+              p_amount: number
+              p_token_symbol: string
+              p_recipient_address: string
+              p_metadata?: Json
+              p_network_id?: number
+            }
+        Returns: undefined
+      }
+      update_wallet_balances: {
+        Args: { transactions: Json }
+        Returns: undefined
       }
     }
     Enums: {
