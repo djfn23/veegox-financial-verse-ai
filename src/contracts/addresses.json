@@ -1,0 +1,48 @@
+
+{
+  "ethereum": {
+    "VEXToken": "",
+    "StableVEX": "",
+    "GovernanceVEX": "",
+    "VeegoxTreasury": "",
+    "VeegoxStaking": "",
+    "VeegoxDAO": "",
+    "VeegoxLending": ""
+  },
+  "polygon": {
+    "VEXToken": "",
+    "StableVEX": "",
+    "GovernanceVEX": "",
+    "VeegoxTreasury": "",
+    "VeegoxStaking": "",
+    "VeegoxDAO": "",
+    "VeegoxLending": ""
+  },
+  "goerli": {
+    "VEXToken": "",
+    "StableVEX": "",
+    "GovernanceVEX": "",
+    "VeegoxTreasury": "",
+    "VeegoxStaking": "",
+    "VeegoxDAO": "",
+    "VeegoxLending": ""
+  },
+  "sepolia": {
+    "VEXToken": "",
+    "StableVEX": "",
+    "GovernanceVEX": "",
+    "VeegoxTreasury": "",
+    "VeegoxStaking": "",
+    "VeegoxDAO": "",
+    "VeegoxLending": ""
+  },
+  "mumbai": {
+    "VEXToken": "",
+    "StableVEX": "",
+    "GovernanceVEX": "",
+    "VeegoxTreasury": "",
+    "VeegoxStaking": "",
+    "VeegoxDAO": "",
+    "VeegoxLending": ""
+  }
+}
