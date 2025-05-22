@@ -2,6 +2,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { ethers } from "ethers";
 import { TokenBalance, Transaction } from "./crypto-service";
+import { BlockchainConfig } from "./blockchain-config";
 
 export interface NFT {
   token_id: string;
@@ -17,9 +18,27 @@ export interface NFT {
  */
 export const BlockchainService = {
   /**
+   * Retourne un provider pour le réseau spécifié
+   */
+  getProvider(network: string = "ethereum"): ethers.providers.JsonRpcProvider {
+    const chainConfig = BlockchainConfig[network as keyof typeof BlockchainConfig] || BlockchainConfig.ethereum;
+    
+    // Création d'un provider avec failover entre les différents RPC URLs
+    const provider = new ethers.providers.FallbackProvider(
+      chainConfig.rpcUrls.map((url, i) => ({
+        provider: new ethers.providers.JsonRpcProvider(url),
+        priority: i + 1,
+        stallTimeout: 2000
+      }))
+    );
+    
+    return provider as ethers.providers.JsonRpcProvider;
+  },
+
+  /**
    * Récupère les transactions d'un wallet
    */
-  async getTransactions(walletAddress: string, chain: string = "eth"): Promise<Transaction[]> {
+  async getTransactions(walletAddress: string, chain: string = "ethereum"): Promise<Transaction[]> {
     try {
       const { data, error } = await supabase.functions.invoke("blockchain", {
         body: { 
@@ -40,7 +59,7 @@ export const BlockchainService = {
   /**
    * Récupère les NFTs d'un wallet
    */
-  async getNFTs(walletAddress: string, chain: string = "eth"): Promise<NFT[]> {
+  async getNFTs(walletAddress: string, chain: string = "ethereum"): Promise<NFT[]> {
     try {
       const { data, error } = await supabase.functions.invoke("blockchain", {
         body: { 
@@ -61,7 +80,7 @@ export const BlockchainService = {
   /**
    * Récupère les balances de tokens ERC20 d'un wallet
    */
-  async getTokenBalances(walletAddress: string, chain: string = "eth"): Promise<TokenBalance[]> {
+  async getTokenBalances(walletAddress: string, chain: string = "ethereum"): Promise<TokenBalance[]> {
     try {
       const { data, error } = await supabase.functions.invoke("blockchain", {
         body: { 
@@ -113,6 +132,28 @@ export const BlockchainService = {
     } catch (error) {
       console.error("Error signing message:", error);
       throw error;
+    }
+  },
+
+  /**
+   * Convertit le nom du réseau en paramètre Moralis
+   */
+  getMoralisChainParam(chain: string): string {
+    switch (chain.toLowerCase()) {
+      case "ethereum":
+        return "eth";
+      case "polygon":
+        return "polygon";
+      case "bsc":
+        return "bsc";
+      case "goerli":
+        return "goerli";
+      case "sepolia":
+        return "sepolia";
+      case "mumbai":
+        return "mumbai";
+      default:
+        return "eth";
     }
   }
 };

@@ -7,6 +7,45 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Configuration des endpoints Moralis
+const moralisEndpoints = {
+  eth: {
+    main: "https://site1.moralis-nodes.com/eth/90afb0797cab47f191f20e328e580934",
+    fallback: "https://site2.moralis-nodes.com/eth/90afb0797cab47f191f20e328e580934"
+  },
+  polygon: {
+    main: "https://site1.moralis-nodes.com/polygon/baf10e3714e745cda2aeb7cd01e89600",
+    fallback: "https://site2.moralis-nodes.com/polygon/baf10e3714e745cda2aeb7cd01e89600"
+  }
+};
+
+// Fonction pour obtenir une URL d'API Moralis basée sur la chaîne
+function getMoralisApiUrl(chain: string, path: string): string {
+  const baseUrl = "https://deep-index.moralis.io/api/v2";
+  return `${baseUrl}${path}`;
+}
+
+// Fonction pour obtenir le chainId Moralis
+function getMoralisChainId(chain: string): string {
+  switch (chain.toLowerCase()) {
+    case "ethereum":
+    case "eth":
+      return "0x1"; // Ethereum Mainnet
+    case "polygon":
+      return "0x89"; // Polygon Mainnet
+    case "bsc":
+      return "0x38"; // BSC Mainnet
+    case "goerli":
+      return "0x5"; // Goerli Testnet
+    case "sepolia":
+      return "0xaa36a7"; // Sepolia Testnet
+    case "mumbai":
+      return "0x13881"; // Mumbai Testnet
+    default:
+      return "0x1"; // Default to Ethereum Mainnet
+  }
+}
+
 serve(async (req) => {
   // Gestion des requêtes CORS preflight
   if (req.method === "OPTIONS") {
@@ -18,31 +57,43 @@ serve(async (req) => {
   // Variables d'environnement pour Supabase et Moralis
   const supabaseUrl = Deno.env.get("SUPABASE_URL") as string;
   const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY") as string;
-  const moralisApiKey = Deno.env.get("MORALIS_API_KEY") as string;
+  const moralisApiKey = Deno.env.get("Moralis") as string;
   
   try {
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
-    const url = new URL(req.url);
-    const path = url.pathname.split("/").pop();
     
-    if (req.method === "GET") {
-      if (path === "transactions") {
-        // Récupérer les transactions d'un wallet sur une blockchain spécifique
-        const walletAddress = url.searchParams.get("address");
-        const chain = url.searchParams.get("chain") || "eth";
+    // Déterminer l'action à partir du corps ou des paramètres d'URL
+    let action, params;
+    
+    if (req.method === "POST") {
+      const body = await req.json();
+      action = body.path;
+      params = body;
+    } else if (req.method === "GET") {
+      const url = new URL(req.url);
+      action = url.pathname.split("/").pop();
+      params = Object.fromEntries(url.searchParams);
+    }
+    
+    // Vérifier si l'action est définie
+    if (!action) {
+      throw new Error("Action non spécifiée");
+    }
+    
+    // Traiter les différentes actions
+    switch (action) {
+      case "transactions": {
+        const { address, chain = "eth" } = params;
         
-        if (!walletAddress) {
-          return new Response(
-            JSON.stringify({ error: "Wallet address is required" }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
+        if (!address) {
+          throw new Error("Adresse wallet requise");
         }
         
         // Appel à l'API Moralis
-        const moralisChain = chain === "eth" ? "0x1" : chain === "polygon" ? "0x89" : chain;
-        const moralisUrl = `https://deep-index.moralis.io/api/v2/${walletAddress}/transactions?chain=${moralisChain}`;
+        const moralisChain = getMoralisChainId(chain);
+        const moralisUrl = getMoralisApiUrl(chain, `/${address}/transactions`);
         
-        const response = await fetch(moralisUrl, {
+        const response = await fetch(`${moralisUrl}?chain=${moralisChain}`, {
           headers: {
             "Accept": "application/json",
             "X-API-Key": moralisApiKey
@@ -52,16 +103,16 @@ serve(async (req) => {
         const data = await response.json();
         
         if (!response.ok) {
-          throw new Error(`API error: ${data.message || "Unknown error"}`);
+          throw new Error(`Erreur API: ${data.message || "Erreur inconnue"}`);
         }
         
-        // Enregistrer les nouvelles transactions dans Supabase
+        // Enregistrer les transactions dans Supabase
         if (data.result && data.result.length > 0) {
-          // Récupérer les transactions déjà enregistrées
+          // Récupérer les transactions existantes
           const { data: existingTxs } = await supabase
             .from("transactions")
             .select("tx_hash")
-            .eq("wallet_address", walletAddress);
+            .eq("wallet_address", address.toLowerCase());
           
           const existingTxHashes = new Set(existingTxs?.map(tx => tx.tx_hash) || []);
           
@@ -71,12 +122,12 @@ serve(async (req) => {
           if (newTransactions.length > 0) {
             // Convertir les transactions au format de notre base de données
             const formattedTxs = newTransactions.map(tx => ({
-              wallet_address: walletAddress.toLowerCase(),
+              wallet_address: address.toLowerCase(),
               tx_hash: tx.hash,
               tx_type: 'transfer',  // À affiner avec un meilleur système de détection
               amount: parseInt(tx.value) / 1e18,  // Conversion de wei à Ether
-              token_symbol: chain === "eth" ? "ETH" : "MATIC",
-              network_id: chain === "eth" ? 1 : chain === "polygon" ? 137 : parseInt(moralisChain),
+              token_symbol: chain === "eth" ? "ETH" : chain === "polygon" ? "MATIC" : "ETH",
+              network_id: chain === "eth" ? 1 : chain === "polygon" ? 137 : parseInt(moralisChain, 16),
               timestamp: new Date(parseInt(tx.block_timestamp) * 1000).toISOString(),
               status: 'confirmed',
               details: {
@@ -105,23 +156,18 @@ serve(async (req) => {
         );
       }
       
-      if (path === "nfts") {
-        // Récupérer les NFTs d'un wallet
-        const walletAddress = url.searchParams.get("address");
-        const chain = url.searchParams.get("chain") || "eth";
+      case "nfts": {
+        const { address, chain = "eth" } = params;
         
-        if (!walletAddress) {
-          return new Response(
-            JSON.stringify({ error: "Wallet address is required" }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
+        if (!address) {
+          throw new Error("Adresse wallet requise");
         }
         
         // Appel à l'API Moralis
-        const moralisChain = chain === "eth" ? "0x1" : chain === "polygon" ? "0x89" : chain;
-        const moralisUrl = `https://deep-index.moralis.io/api/v2/${walletAddress}/nft?chain=${moralisChain}&format=decimal`;
+        const moralisChain = getMoralisChainId(chain);
+        const moralisUrl = getMoralisApiUrl(chain, `/${address}/nft`);
         
-        const response = await fetch(moralisUrl, {
+        const response = await fetch(`${moralisUrl}?chain=${moralisChain}&format=decimal`, {
           headers: {
             "Accept": "application/json",
             "X-API-Key": moralisApiKey
@@ -131,7 +177,7 @@ serve(async (req) => {
         const data = await response.json();
         
         if (!response.ok) {
-          throw new Error(`API error: ${data.message || "Unknown error"}`);
+          throw new Error(`Erreur API: ${data.message || "Erreur inconnue"}`);
         }
         
         return new Response(
@@ -140,23 +186,18 @@ serve(async (req) => {
         );
       }
       
-      if (path === "tokenBalances") {
-        // Récupérer les balances de tokens ERC20 d'un wallet
-        const walletAddress = url.searchParams.get("address");
-        const chain = url.searchParams.get("chain") || "eth";
+      case "tokenBalances": {
+        const { address, chain = "eth" } = params;
         
-        if (!walletAddress) {
-          return new Response(
-            JSON.stringify({ error: "Wallet address is required" }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
+        if (!address) {
+          throw new Error("Adresse wallet requise");
         }
         
         // Appel à l'API Moralis
-        const moralisChain = chain === "eth" ? "0x1" : chain === "polygon" ? "0x89" : chain;
-        const moralisUrl = `https://deep-index.moralis.io/api/v2/${walletAddress}/erc20?chain=${moralisChain}`;
+        const moralisChain = getMoralisChainId(chain);
+        const moralisUrl = getMoralisApiUrl(chain, `/${address}/erc20`);
         
-        const response = await fetch(moralisUrl, {
+        const response = await fetch(`${moralisUrl}?chain=${moralisChain}`, {
           headers: {
             "Accept": "application/json",
             "X-API-Key": moralisApiKey
@@ -166,17 +207,17 @@ serve(async (req) => {
         const data = await response.json();
         
         if (!response.ok) {
-          throw new Error(`API error: ${data.message || "Unknown error"}`);
+          throw new Error(`Erreur API: ${data.message || "Erreur inconnue"}`);
         }
         
         // Synchroniser avec la base de données
         if (data.result && data.result.length > 0) {
-          const networkId = chain === "eth" ? 1 : chain === "polygon" ? 137 : parseInt(moralisChain);
+          const networkId = chain === "eth" ? 1 : chain === "polygon" ? 137 : parseInt(moralisChain, 16);
           
           // Pour chaque token, mettre à jour ou insérer dans la base de données
           for (const token of data.result) {
             const tokenBalance = {
-              wallet_address: walletAddress.toLowerCase(),
+              wallet_address: address.toLowerCase(),
               token_symbol: token.symbol,
               balance: parseInt(token.balance) / Math.pow(10, parseInt(token.decimals)),
               network_id: networkId,
@@ -187,7 +228,7 @@ serve(async (req) => {
             const { data: existingBalance } = await supabase
               .from("token_balances")
               .select("*")
-              .eq("wallet_address", walletAddress.toLowerCase())
+              .eq("wallet_address", address.toLowerCase())
               .eq("token_symbol", token.symbol)
               .eq("network_id", networkId)
               .single();
@@ -215,26 +256,16 @@ serve(async (req) => {
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-    } else if (req.method === "POST") {
-      if (path === "registerProfile") {
-        // Enregistrer un nouveau profil utilisateur lors de la première connexion
-        const { data: authData, error: authError } = await supabase.auth.getUser();
-        
-        if (authError || !authData.user) {
-          return new Response(
-            JSON.stringify({ error: "Unauthorized" }),
-            { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
+      
+      case "registerProfile": {
+        if (req.method !== "POST") {
+          throw new Error("Cette action nécessite une requête POST");
         }
         
-        const requestData = await req.json();
-        const { walletAddress } = requestData;
+        const { walletAddress, username, email, avatar_url } = params;
         
         if (!walletAddress) {
-          return new Response(
-            JSON.stringify({ error: "Wallet address is required" }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
+          throw new Error("Adresse wallet requise");
         }
         
         // Vérifier si le profil existe déjà
@@ -246,7 +277,7 @@ serve(async (req) => {
         
         if (existingProfile) {
           return new Response(
-            JSON.stringify({ profile: existingProfile, message: "Profile already exists" }),
+            JSON.stringify({ profile: existingProfile, message: "Profil existant" }),
             { headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
@@ -256,36 +287,32 @@ serve(async (req) => {
           .from("user_profiles")
           .insert([{
             wallet_address: walletAddress.toLowerCase(),
-            username: requestData.username || `user_${walletAddress.substring(2, 8)}`,
-            email: requestData.email || null,
-            avatar_url: requestData.avatar_url || null
+            username: username || `user_${walletAddress.substring(2, 8)}`,
+            email: email || null,
+            avatar_url: avatar_url || null
           }])
           .select()
           .single();
         
         if (profileError) {
-          return new Response(
-            JSON.stringify({ error: profileError.message }),
-            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
+          throw new Error(`Erreur lors de la création du profil: ${profileError.message}`);
         }
         
         return new Response(
-          JSON.stringify({ profile, message: "Profile created successfully" }),
+          JSON.stringify({ profile, message: "Profil créé avec succès" }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
+      
+      default:
+        throw new Error(`Action non supportée: ${action}`);
     }
     
-    // Si on arrive ici, l'endpoint demandé n'existe pas
-    return new Response(
-      JSON.stringify({ error: "Not found" }),
-      { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
-    
   } catch (error) {
+    console.error("Erreur:", error);
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error.message || "Une erreur s'est produite" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

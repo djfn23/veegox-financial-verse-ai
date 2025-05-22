@@ -2,6 +2,8 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { ethers } from "ethers";
 import { useToast } from "@/components/ui/use-toast";
+import { BlockchainService } from "@/services/blockchain-service";
+import { BlockchainConfig } from "@/services/blockchain-config";
 
 interface Web3ContextType {
   account: string | null;
@@ -11,6 +13,7 @@ interface Web3ContextType {
   connectWallet: () => Promise<void>;
   disconnectWallet: () => void;
   isConnected: boolean;
+  switchNetwork: (networkName: string) => Promise<boolean>;
 }
 
 const Web3Context = createContext<Web3ContextType | undefined>(undefined);
@@ -75,6 +78,72 @@ export const Web3Provider = ({ children }: Web3ProviderProps) => {
       });
     } finally {
       setIsConnecting(false);
+    }
+  };
+
+  const switchNetwork = async (networkName: string): Promise<boolean> => {
+    if (!window.ethereum || !provider) {
+      toast({
+        title: "Wallet non connecté",
+        description: "Veuillez connecter votre wallet pour changer de réseau",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    try {
+      const config = BlockchainConfig[networkName as keyof typeof BlockchainConfig];
+      if (!config) {
+        throw new Error(`Réseau ${networkName} non supporté`);
+      }
+
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: `0x${config.chainId.toString(16)}` }],
+      });
+
+      // Le chainChanged event mettra à jour le chainId
+      return true;
+    } catch (error: any) {
+      // Si l'erreur est 4902, cela signifie que le réseau n'est pas dans le wallet
+      if (error.code === 4902) {
+        try {
+          const config = BlockchainConfig[networkName as keyof typeof BlockchainConfig];
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [
+              {
+                chainId: `0x${config.chainId.toString(16)}`,
+                chainName: config.name,
+                nativeCurrency: {
+                  name: networkName === "ethereum" ? "Ether" : networkName === "polygon" ? "MATIC" : "ETH",
+                  symbol: networkName === "ethereum" ? "ETH" : networkName === "polygon" ? "MATIC" : "ETH",
+                  decimals: 18
+                },
+                rpcUrls: config.rpcUrls,
+                blockExplorerUrls: [config.blockExplorer]
+              }
+            ],
+          });
+          return true;
+        } catch (addError) {
+          console.error("Erreur lors de l'ajout du réseau:", addError);
+          toast({
+            title: "Erreur de réseau",
+            description: `Impossible d'ajouter le réseau ${networkName}`,
+            variant: "destructive",
+          });
+          return false;
+        }
+      } else {
+        console.error("Erreur lors du changement de réseau:", error);
+        toast({
+          title: "Erreur de réseau",
+          description: `Impossible de changer pour le réseau ${networkName}`,
+          variant: "destructive",
+        });
+        return false;
+      }
     }
   };
 
@@ -148,6 +217,7 @@ export const Web3Provider = ({ children }: Web3ProviderProps) => {
     connectWallet,
     disconnectWallet,
     isConnected: !!account,
+    switchNetwork
   };
 
   return <Web3Context.Provider value={value}>{children}</Web3Context.Provider>;

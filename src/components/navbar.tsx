@@ -1,133 +1,119 @@
-
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Menu, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import Logo from "./logo";
-import { Menu, X } from "lucide-react";
-import WalletConnect from "./wallet-connect";
+import { Logo } from './logo';
+import WalletConnect from './wallet-connect';
+import NetworkSwitcher from "./network-switcher";
 
 const Navbar = () => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const toggleMenu = () => setMobileMenuOpen(!mobileMenuOpen);
-
-  const navItems = [
-    { name: "Explorer", href: "/explore" },
-    { name: "Produits", href: "#", children: [
-      { name: "Crédit", href: "/lending" },
-      { name: "Épargne", href: "/savings" },
-      { name: "Investissement IA", href: "/ai-investing" },
-    ]},
-    { name: "Tokens", href: "/tokens" },
-    { name: "Gouvernance", href: "/governance" },
-    { name: "Whitepaper", href: "/whitepaper" },
-    { name: "Blog", href: "/blog" },
-    { name: "Contact", href: "/contact" },
-  ];
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-veegox-darker-bg/80 backdrop-blur-md border-b border-veegox-dark-bg/50">
+    <header className="fixed top-0 left-0 w-full bg-veegox-dark-bg/90 backdrop-blur-md z-50 py-4 border-b border-veegox-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center">
-            <Logo />
+        <div className="flex justify-between items-center">
+          {/* Logo et Navigation */}
+          <div className="flex items-center space-x-8">
+            <Link to="/" className="flex items-center space-x-2">
+              <Logo />
+            </Link>
+            
+            {/* Navigation principale - visible sur desktop */}
+            <nav className="hidden md:flex space-x-6">
+              <Link to="/explore" className="text-gray-400 hover:text-white transition-colors">
+                Explorer
+              </Link>
+              <Link to="/tokens" className="text-gray-400 hover:text-white transition-colors">
+                Tokens
+              </Link>
+              <Link to="/lending" className="text-gray-400 hover:text-white transition-colors">
+                Prêts
+              </Link>
+              <Link to="/savings" className="text-gray-400 hover:text-white transition-colors">
+                Épargne
+              </Link>
+              <Link to="/ai-investing" className="text-gray-400 hover:text-white transition-colors">
+                IA Investissement
+              </Link>
+              <Link to="/governance" className="text-gray-400 hover:text-white transition-colors">
+                Gouvernance
+              </Link>
+              <Link to="/blog" className="text-gray-400 hover:text-white transition-colors">
+                Blog
+              </Link>
+              <Link to="/contact" className="text-gray-400 hover:text-white transition-colors">
+                Contact
+              </Link>
+            </nav>
           </div>
-
-          {/* Desktop menu */}
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-center space-x-8">
-              {navItems.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className="text-gray-300 hover:text-white transition-colors"
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div className="hidden md:flex items-center space-x-4">
-            <WalletConnect />
-            <Link to="/dashboard">
-              <Button
-                variant="outline"
-                className="border-veegox-purple/50 text-white"
-              >
-                Dashboard
+          
+          {/* Actions */}
+          <div className="flex items-center space-x-4">
+            <Link to="/testnet-config" className="hidden sm:inline-block">
+              <Button variant="outline" size="sm" className="border-veegox-border text-gray-400 hover:bg-veegox-border/10">
+                Testnet
               </Button>
             </Link>
-          </div>
-
-          {/* Mobile menu button */}
-          <div className="flex md:hidden">
-            <button
-              type="button"
-              onClick={toggleMenu}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-veegox-purple/20 focus:outline-none"
-              aria-expanded="false"
-            >
-              <span className="sr-only">Open main menu</span>
-              {mobileMenuOpen ? (
-                <X className="block h-6 w-6" aria-hidden="true" />
-              ) : (
-                <Menu className="block h-6 w-6" aria-hidden="true" />
-              )}
-            </button>
+            
+            <NetworkSwitcher />
+            
+            <WalletConnect />
+            
+            {/* Menu mobile */}
+            <div className="md:hidden">
+              <Button variant="ghost" size="icon" onClick={toggleMenu}>
+                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Mobile menu, show/hide based on menu state */}
-      {mobileMenuOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-veegox-dark-bg">
-            {navItems.map((item) => (
-              item.children ? (
-                <div key={item.name}>
-                  <div className="px-3 py-2 text-base font-medium text-gray-300">
-                    {item.name}
-                  </div>
-                  <div className="pl-4 space-y-1">
-                    {item.children.map((child) => (
-                      <Link
-                        key={child.name}
-                        to={child.href}
-                        className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-veegox-purple/20 hover:text-white"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        {child.name}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-veegox-purple/20 hover:text-white"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {item.name}
-                </Link>
-              )
-            ))}
-            <div className="pt-4 pb-3 space-y-2">
-              <WalletConnect />
-              <Link to="/dashboard" className="w-full block" onClick={() => setMobileMenuOpen(false)}>
-                <Button
-                  variant="outline"
-                  className="w-full border-veegox-purple/50 text-white"
-                >
-                  Dashboard
-                </Button>
-              </Link>
-            </div>
+      {/* Menu mobile - en overlay */}
+      {isMenuOpen && (
+        <div className="fixed top-0 left-0 w-full h-screen bg-veegox-dark-bg z-40 p-4 md:hidden">
+          <div className="flex justify-end">
+            <Button variant="ghost" size="icon" onClick={toggleMenu}>
+              <X className="h-6 w-6" />
+            </Button>
           </div>
+          <nav className="flex flex-col space-y-4 items-center mt-12">
+            <Link to="/explore" className="text-gray-400 hover:text-white transition-colors text-lg" onClick={toggleMenu}>
+              Explorer
+            </Link>
+            <Link to="/tokens" className="text-gray-400 hover:text-white transition-colors text-lg" onClick={toggleMenu}>
+              Tokens
+            </Link>
+            <Link to="/lending" className="text-gray-400 hover:text-white transition-colors text-lg" onClick={toggleMenu}>
+              Prêts
+            </Link>
+            <Link to="/savings" className="text-gray-400 hover:text-white transition-colors text-lg" onClick={toggleMenu}>
+              Épargne
+            </Link>
+            <Link to="/ai-investing" className="text-gray-400 hover:text-white transition-colors text-lg" onClick={toggleMenu}>
+              IA Investissement
+            </Link>
+            <Link to="/governance" className="text-gray-400 hover:text-white transition-colors text-lg" onClick={toggleMenu}>
+              Gouvernance
+            </Link>
+            <Link to="/blog" className="text-gray-400 hover:text-white transition-colors text-lg" onClick={toggleMenu}>
+              Blog
+            </Link>
+            <Link to="/contact" className="text-gray-400 hover:text-white transition-colors text-lg" onClick={toggleMenu}>
+              Contact
+            </Link>
+            <Link to="/testnet-config" className="text-gray-400 hover:text-white transition-colors text-lg" onClick={toggleMenu}>
+              Testnet
+            </Link>
+          </nav>
         </div>
       )}
-    </nav>
+    </header>
   );
 };
 

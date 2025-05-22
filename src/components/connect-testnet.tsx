@@ -1,95 +1,45 @@
 
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
+import { Button } from "./ui/button";
+import { useWeb3 } from "@/context/Web3Context";
+import { useState } from "react";
 
-interface NetworkParams {
-  chainId: string;
-  chainName: string;
-  nativeCurrency: {
-    name: string;
-    symbol: string;
-    decimals: number;
-  };
-  rpcUrls: string[];
-  blockExplorerUrls: string[];
+interface ConnectTestnetProps {
+  network: "goerli" | "sepolia" | "mumbai";
 }
 
-const ConnectTestnet = ({ network }: { network: "goerli" | "sepolia" | "mumbai" }) => {
-  const { toast } = useToast();
+const ConnectTestnet = ({ network }: ConnectTestnetProps) => {
+  const { switchNetwork } = useWeb3();
+  const [isConnecting, setIsConnecting] = useState(false);
 
-  const networks: Record<string, NetworkParams> = {
-    goerli: {
-      chainId: "0x5",
-      chainName: "Goerli Testnet",
-      nativeCurrency: {
-        name: "Goerli ETH",
-        symbol: "ETH",
-        decimals: 18,
-      },
-      rpcUrls: ["https://goerli.infura.io/v3/"],
-      blockExplorerUrls: ["https://goerli.etherscan.io"],
-    },
-    sepolia: {
-      chainId: "0xaa36a7",
-      chainName: "Sepolia Testnet",
-      nativeCurrency: {
-        name: "Sepolia ETH",
-        symbol: "ETH",
-        decimals: 18,
-      },
-      rpcUrls: ["https://sepolia.infura.io/v3/"],
-      blockExplorerUrls: ["https://sepolia.etherscan.io"],
-    },
-    mumbai: {
-      chainId: "0x13881",
-      chainName: "Mumbai Testnet",
-      nativeCurrency: {
-        name: "MATIC",
-        symbol: "MATIC",
-        decimals: 18,
-      },
-      rpcUrls: ["https://rpc-mumbai.maticvigil.com/"],
-      blockExplorerUrls: ["https://mumbai.polygonscan.com"],
-    },
+  const networkNames: Record<string, string> = {
+    goerli: "Goerli",
+    sepolia: "Sepolia",
+    mumbai: "Mumbai"
   };
-  
-  const addNetwork = async () => {
-    if (!window.ethereum) {
-      toast({
-        title: "Wallet non détecté",
-        description: "Veuillez installer MetaMask ou un autre wallet compatible Web3",
-        variant: "destructive",
-      });
-      return;
-    }
-    
+
+  const networkLabels: Record<string, string> = {
+    goerli: "Ethereum Goerli",
+    sepolia: "Ethereum Sepolia",
+    mumbai: "Polygon Mumbai"
+  };
+
+  const handleNetworkSwitch = async () => {
+    setIsConnecting(true);
     try {
-      await window.ethereum.request({
-        method: "wallet_addEthereumChain",
-        params: [networks[network]],
-      });
-      
-      toast({
-        title: "Réseau ajouté",
-        description: `${networks[network].chainName} a été ajouté à votre wallet`,
-      });
-    } catch (error) {
-      console.error("Erreur lors de l'ajout du réseau:", error);
-      toast({
-        title: "Erreur",
-        description: "Impossible d'ajouter le réseau à votre wallet",
-        variant: "destructive",
-      });
+      await switchNetwork(network);
+    } finally {
+      setIsConnecting(false);
     }
   };
-  
+
   return (
     <Button 
-      onClick={addNetwork}
       variant="outline"
-      className="border-veegox-purple/50 text-white hover:bg-veegox-purple/10"
+      className="border-veegox-purple text-veegox-purple hover:bg-veegox-purple/10"
+      onClick={handleNetworkSwitch}
+      disabled={isConnecting}
     >
-      Ajouter {networks[network].chainName}
+      {isConnecting ? `Connexion à ${networkNames[network]}...` : `${networkLabels[network]}`}
     </Button>
   );
 };
