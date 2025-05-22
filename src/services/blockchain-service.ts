@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { ethers } from "ethers";
 import { TokenBalance, Transaction } from "./crypto-service";
@@ -20,7 +19,7 @@ export const BlockchainService = {
   /**
    * Retourne un provider pour le réseau spécifié
    */
-  getProvider(network: string = "ethereum"): ethers.providers.JsonRpcProvider {
+  getProvider(network: string = "ethereum"): ethers.providers.Provider {
     const chainConfig = BlockchainConfig[network as keyof typeof BlockchainConfig] || BlockchainConfig.ethereum;
     
     // Création d'un provider avec failover entre les différents RPC URLs
@@ -32,7 +31,7 @@ export const BlockchainService = {
       }))
     );
     
-    return provider as ethers.providers.JsonRpcProvider;
+    return provider;
   },
 
   /**
