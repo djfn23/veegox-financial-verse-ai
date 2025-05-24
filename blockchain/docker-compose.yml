@@ -1,0 +1,13 @@
+version: '3.7'
+services:
+  veegoxchain-node1:
+    build: .
+    container_name: veegoxchain-node1
+    ports:
+      - "8545:8545" # RPC
+      - "9632:9632" # gRPC
+      - "10000:10000" # P2P
+    volumes:
+      - ./nodes/node1:/chain/nodes/node1
+      - ./genesis.json:/chain/genesis.json
+    restart: unless-stopped
