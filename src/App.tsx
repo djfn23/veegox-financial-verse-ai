@@ -20,6 +20,14 @@ import Contact from '@/pages/Contact';
 import TestnetConfig from '@/pages/TestnetConfig';
 import Whitepaper from '@/pages/Whitepaper';
 import AdminSetup from '@/pages/AdminSetup';
+import About from '@/pages/About';
+import Products from '@/pages/Products';
+
+// Product pages
+import ProductsLending from '@/pages/products/Lending';
+import ProductsSavings from '@/pages/products/Savings';
+import ProductsStaking from '@/pages/products/Staking';
+import ProductsInvesting from '@/pages/products/Investing';
 
 function App() {
   return (
@@ -38,6 +46,16 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/whitepaper" element={<Whitepaper />} />
           <Route path="/testnet-config" element={<TestnetConfig />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/products" element={<Products />} />
+          
+          {/* Product detail pages */}
+          <Route path="/products/lending" element={<ProductsLending />} />
+          <Route path="/products/savings" element={<ProductsSavings />} />
+          <Route path="/products/staking" element={<ProductsStaking />} />
+          <Route path="/products/investing" element={<ProductsInvesting />} />
+          
+          {/* Admin routes */}
           <Route path="/admin/wallets" element={<AdminWallets />} />
           <Route path="/admin/commissions" element={<CommissionSettings />} />
           <Route path="/admin/setup" element={<AdminSetup />} />
