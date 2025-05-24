@@ -9,11 +9,14 @@ const networks = {};
 Object.entries({
   ethereum: BlockchainConfig.ethereum,
   polygon: BlockchainConfig.polygon,
+  veegoxchain: BlockchainConfig.veegoxchain,
 }).forEach(([networkName, config]) => {
   networks[networkName] = {
     url: config.rpcUrls[0],
     chainId: config.chainId,
-    accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : []
+    accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+    gas: networkName === 'veegoxchain' ? 30000000 : undefined,
+    gasPrice: networkName === 'veegoxchain' ? 1000000000 : undefined, // 1 gwei
   };
 });
 
@@ -31,7 +34,15 @@ Object.entries({
 });
 
 module.exports = {
-  solidity: "0.8.20",
+  solidity: {
+    version: "0.8.20",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200
+      }
+    }
+  },
   networks,
   paths: {
     artifacts: "./src/artifacts"

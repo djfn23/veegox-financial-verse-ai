@@ -22,6 +22,16 @@ export const BlockchainConfig = {
     name: "Polygon Mainnet",
     blockExplorer: "https://polygonscan.com"
   },
+  veegoxchain: {
+    rpcUrls: [
+      "http://localhost:10002",
+      "http://localhost:20002",
+      "http://localhost:30002"
+    ],
+    chainId: 1999,
+    name: "VeegoxChain",
+    blockExplorer: "http://localhost:4000"
+  },
   goerli: {
     rpcUrls: ["https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"],
     chainId: 5,

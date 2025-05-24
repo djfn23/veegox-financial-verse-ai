@@ -18,6 +18,15 @@
     "VeegoxDAO": "",
     "VeegoxLending": ""
   },
+  "veegoxchain": {
+    "VEXToken": "",
+    "StableVEX": "",
+    "GovernanceVEX": "",
+    "VeegoxTreasury": "",
+    "VeegoxStaking": "",
+    "VeegoxDAO": "",
+    "VeegoxLending": ""
+  },
   "goerli": {
     "VEXToken": "",
     "StableVEX": "",
