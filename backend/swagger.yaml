@@ -1,0 +1,82 @@
+openapi: 3.0.0
+info:
+  title: API VeegoxChain
+  description: API REST Web3 pour la blockchain VeegoxChain
+  version: 1.0.0
+servers:
+  - url: http://localhost:3001/api
+paths:
+  /ping:
+    get:
+      summary: Ping API
+      responses:
+        '200':
+          description: OK
+  /balance/{address}:
+    get:
+      summary: Solde VEX d'une adresse
+      parameters:
+        - in: path
+          name: address
+          schema:
+            type: string
+          required: true
+          description: Adresse à interroger
+      responses:
+        '200':
+          description: Solde retourné
+  /transactions/{address}:
+    get:
+      summary: Transactions d'une adresse
+      parameters:
+        - in: path
+          name: address
+          schema:
+            type: string
+          required: true
+          description: Adresse à interroger
+      responses:
+        '200':
+          description: Liste des transactions
+  /network-stats:
+    get:
+      summary: Statistiques réseau
+      responses:
+        '200':
+          description: Statistiques retournées
+  /moralis/erc20/{address}:
+    get:
+      summary: Tokens ERC20 d'une adresse
+      parameters:
+        - in: path
+          name: address
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Liste des tokens
+  /moralis/nfts/{address}:
+    get:
+      summary: NFTs d'une adresse
+      parameters:
+        - in: path
+          name: address
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Liste des NFTs
+  /waltio/export/{address}:
+    get:
+      summary: Export CSV Waltio
+      parameters:
+        - in: path
+          name: address
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Fichier CSV téléchargé
