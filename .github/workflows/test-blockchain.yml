@@ -1,0 +1,74 @@
+
+name: Test VeegoxChain
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-contracts:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Compile contracts
+      run: npx hardhat compile
+
+    - name: Run contract tests
+      run: npx hardhat test
+
+    - name: Generate coverage report
+      run: npx hardhat coverage
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./coverage/lcov.info
+        flags: contracts
+        name: contract-coverage
+
+  test-blockchain-startup:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Polygon Edge
+      run: |
+        wget https://github.com/0xPolygon/polygon-edge/releases/latest/download/polygon-edge_linux_amd64.tar.gz
+        tar -xzf polygon-edge_linux_amd64.tar.gz
+        sudo mv polygon-edge /usr/local/bin/
+
+    - name: Test blockchain initialization
+      run: |
+        cd blockchain
+        chmod +x init-veegoxchain.sh
+        ./init-veegoxchain.sh
+        
+    - name: Test blockchain startup
+      run: |
+        cd blockchain
+        chmod +x start-veegoxchain.sh
+        timeout 60s ./start-veegoxchain.sh || true
+        
+    - name: Verify blockchain health
+      run: |
+        sleep 10
+        curl -X POST http://localhost:10002 \
+          -H "Content-Type: application/json" \
+          -d '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}' \
+          | grep -q "0x7cf" # 1999 in hex

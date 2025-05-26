@@ -1,0 +1,25 @@
+
+# Dockerfile de production pour VeegoxChain
+FROM ghcr.io/0xpolygon/polygon-edge:latest as base
+
+# Install curl for healthchecks
+RUN apk add --no-cache curl
+
+WORKDIR /chain
+
+# Copy genesis and node configurations
+COPY ./genesis.json ./
+COPY ./nodes ./nodes
+
+# Create entrypoint script
+COPY ./docker-entrypoint.sh ./
+RUN chmod +x ./docker-entrypoint.sh
+
+# Expose ports
+EXPOSE 8545 8546 9632 10000 9090
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+  CMD curl -f http://localhost:8545 || exit 1
+
+ENTRYPOINT ["./docker-entrypoint.sh"]
